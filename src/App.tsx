@@ -1,35 +1,52 @@
-import {useState} from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+  import {useEffect, useState} from 'react';
+  import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0);
+  const urlGetMessage = 'http://146.185.154.90:8000/messages';
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
-}
+  const App = () => {
 
-export default App;
+    interface Props {
+      id: string;
+      author: string;
+      message: string;
+      datetime: string;
+    }
+
+    const [posts, setPosts] = useState<Props[]>([]);
+
+    useEffect(() => {
+      const fetchPosts = async () => {
+        const response = await fetch(urlGetMessage);
+        const newPosts = await response.json();
+        setPosts(newPosts);
+      };
+      fetchPosts();
+      console.log(posts); ///////////
+
+    }, []);
+
+    const convertDate = (datetime: string) => {
+        const date = new Date(datetime);
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()},
+          Time ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    };
+
+
+    return (
+      <>
+        <h1>content</h1>
+
+        {posts.map(post => (
+          <div key={post.id} className='post'>
+            <p>Author {post.author} </p>
+            <p>message {post.message}</p>
+            {/*<p>datetime {post.datetime}</p>*/}
+            <p>{convertDate(post.datetime)}</p>
+          </div>
+        ))}
+
+      </>
+    );
+  };
+
+  export default App;
